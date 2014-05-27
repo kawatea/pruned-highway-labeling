@@ -13,7 +13,7 @@ Usage
 * Execute `make` to build programs.
 * Execute `construct` to construct labels for a graph.
 * Execute `query` to query distance between two vertices.
-* In a graph file, each line should contain two vertices, travel time and geometrical length.
+* In a graph file, each line should contain two vertices, travel time and geometrical length (see `sample_graph.tsv`).
 * Vertices should be described by integers starting from zero.
 
 Please see `pruned_highway_labeling.h` and `benchmark.cpp` for detailed information.
