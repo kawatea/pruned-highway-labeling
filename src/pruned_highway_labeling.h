@@ -126,7 +126,10 @@ void PrunedHighwayLabeling::ConstructLabel(const char *file) {
     {
         std::vector <road> edges;
         FILE *in = fopen(file, "r");
-        if (in == NULL) return;
+        if (in == NULL) {
+            fprintf(stderr, "Can't open the graph file\n");
+            return;
+        }
         for (int from, to, time, dist; fscanf(in, "%d %d %d %d", &from, &to, &time, &dist) != EOF; ) {
             V = std::max(V, from + 1);
             V = std::max(V, to + 1);
@@ -151,6 +154,7 @@ void PrunedHighwayLabeling::ConstructLabel(const char *file) {
     label = (label_t *)memalign(64, sizeof(label_t) * V);
     if (label == NULL) {
         V = 0;
+        fprintf(stderr, "Out of memory\n");
         return;
     }
     for (int v = 0; v < V; v++) {
@@ -322,6 +326,7 @@ void PrunedHighwayLabeling::ConstructLabel(const char *file) {
                 label[v].cost = (int *)memalign(64, sizeof(int) * tmp_label[v].second.size() * 2);
                 if (label[v].path == NULL || label[v].cost == NULL) {
                     Free();
+                    fprintf(stderr, "Out of memory\n");
                     return;
                 }
                 for (size_t i = 0; i < tmp_label[v].first.size(); i++) label[v].path[i] = (tmp_label[v].first[i] & PATH_MASK) + (tmp_label[v].first[i] & NUM_MASK) * 2;
@@ -348,13 +353,17 @@ void PrunedHighwayLabeling::LoadLabel(const char *file) {
     Free();
     
     FILE *in = fopen(file, "rb");
-    if (in == NULL) return;
+    if (in == NULL) {
+        fprintf(stderr, "Can't open the label file\n");
+        return;
+    }
     fread(&V, sizeof(int), 1, in);
     contract.resize(V);
     fread(&contract[0], sizeof(int), V, in);
     label = (label_t *)memalign(64, sizeof(label_t) * V);
     if (label == NULL) {
         V = 0;
+        fprintf(stderr, "Out of memory\n");
         return;
     }
     for (int v = 0; v < V; v++) {
@@ -373,6 +382,7 @@ void PrunedHighwayLabeling::LoadLabel(const char *file) {
             label[v].cost = (int *)memalign(64, sizeof(int) * snum);
             if (label[v].path == NULL || label[v].cost == NULL) {
                 Free();
+                fprintf(stderr, "Out of memory\n");
                 return;
             }
             fread(label[v].path, sizeof(unsigned), fnum, in);
@@ -390,7 +400,10 @@ void PrunedHighwayLabeling::LoadLabel(const char *file) {
 
 void PrunedHighwayLabeling::StoreLabel(const char *file) {
     FILE *out = fopen(file, "wb");
-    if (out == NULL) return;
+    if (out == NULL) {
+        fprintf(stderr, "Can't open the label file\n");
+        return;
+    }
     fwrite(&V, sizeof(int), 1, out);
     fwrite(&contract[0], sizeof(int), V, out);
     for (int v = 0; v < V; v++) {
