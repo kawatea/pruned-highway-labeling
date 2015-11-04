@@ -235,6 +235,7 @@ void PrunedHighwayLabeling::ConstructLabel(const char *file) {
     {
         unsigned path_num = 0;
         std::vector <bool> used(V, false);
+        std::vector <bool> visited(V, false);
         std::vector <int> cost(V, INF);
         std::vector <int> dist(V);
         std::vector <int> parent(V, -1);
@@ -261,6 +262,7 @@ void PrunedHighwayLabeling::ConstructLabel(const char *file) {
                     int now = path_que.top().second;
                     path_que.pop();
                     if (cost[now] < time) continue;
+                    visited[now] = true;
                     visit[visit_num++] = now;
                     for (size_t k = 0; k < graph[now].size(); k++) {
                         int w = graph[now][k].to;
@@ -285,7 +287,7 @@ void PrunedHighwayLabeling::ConstructLabel(const char *file) {
                     int next = -1, max_child = 0;
                     for (size_t k = 0; k < graph[end].size(); k++) {
                         int w = graph[end][k].to;
-                        if (parent[w] == end && child[w] > max_child) {
+                        if (visited[w] && parent[w] == end && child[w] > max_child) {
                             next = w;
                             max_child = child[w];
                         }
@@ -335,6 +337,7 @@ void PrunedHighwayLabeling::ConstructLabel(const char *file) {
                 }
                 
                 for (int k = 0; k < check_num; k++) {
+                    visited[check[k]] = false;
                     cost[check[k]] = INF;
                     parent[check[k]] = -1;
                     child[check[k]] = 0;
